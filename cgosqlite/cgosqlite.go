@@ -222,7 +222,11 @@ func (stmt *Stmt) SQL() string {
 }
 
 func (stmt *Stmt) ExpandedSQL() string {
-	return C.GoString(C.sqlite3_expanded_sql(stmt.stmt.ptr()))
+	// sqlite3_expanded_sql returns a string obtained by sqlite3_malloc, which
+	// must be freed after use.
+	cstr := C.sqlite3_expanded_sql(stmt.stmt.ptr())
+	defer C.sqlite3_free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 func (stmt *Stmt) Reset() error {

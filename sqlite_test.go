@@ -1539,3 +1539,32 @@ func TestConnLogger_read_tx(t *testing.T) {
 		}
 	}
 }
+
+func TestExpandedSQL(t *testing.T) {
+	ctx := context.Background()
+	connector := Connector("file:"+t.TempDir()+"/test.db", nil, nil)
+	sqlConn, err := connector.Connect(ctx)
+	if err != nil {
+		t.Fatalf("Connect: %v", err)
+	}
+	conn := sqlConn.(*conn)
+
+	sqlStmt, err := conn.PrepareContext(ctx, "SELECT ? + ?")
+	if err != nil {
+		t.Fatalf("PrepareContext: %v", err)
+	}
+	stmt, ok := sqlStmt.(*stmt)
+	if !ok {
+		t.Fatalf("not a *stmt: %#v", stmt)
+	}
+	if err := stmt.bindAll([]driver.NamedValue{
+		{Ordinal: 1, Value: 6},
+		{Ordinal: 2, Value: 7},
+	}); err != nil {
+		t.Errorf("bindAll: %v", err)
+	}
+
+	if got, want := stmt.stmt.ExpandedSQL(), "SELECT 6 + 7"; got != want {
+		t.Errorf("wrong sql: got %q, want %q", got, want)
+	}
+}
