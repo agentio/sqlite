@@ -1,12 +1,5 @@
-# SQLite driver for Go `database/sql`
+# SQLite Interface for Go
 
-Work in progress. Nothing to see here.
+This project is an experimental fork of https://github.com/tailscale/sqlite.
 
-## Updating SQLite
-
-The script `update-sqlite.sh` at the top of the repository partially automates
-this process. It expects a SQLite amalgamation URL as the first argument:
-
-```
-./update-sqlite.sh https://sqlite.org/2024/sqlite-amalgamation-3460100.zip
-```
+Please use that package instead of this one.

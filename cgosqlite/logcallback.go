@@ -20,7 +20,7 @@ import (
 	"sync"
 	"unsafe"
 
-	"github.com/tailscale/sqlite/sqliteh"
+	"github.com/agentio/sqlite/sqliteh"
 )
 
 // LogCallback receives SQLite log messages.

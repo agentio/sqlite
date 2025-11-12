@@ -54,7 +54,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/tailscale/sqlite/sqliteh"
+	"github.com/agentio/sqlite/sqliteh"
 )
 
 func init() {

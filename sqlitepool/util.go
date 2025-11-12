@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/tailscale/sqlite/sqliteh"
+	"github.com/agentio/sqlite/sqliteh"
 )
 
 // CopyAll copies the contents of one database to another.

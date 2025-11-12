@@ -7,8 +7,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/tailscale/sqlite/cgosqlite"
-	"github.com/tailscale/sqlite/sqliteh"
+	"github.com/agentio/sqlite/cgosqlite"
+	"github.com/agentio/sqlite/sqliteh"
 )
 
 // ensure LogCallback is convertible to cgosqlite.LogCallback

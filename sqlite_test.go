@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tailscale/sqlite/sqliteh"
+	"github.com/agentio/sqlite/sqliteh"
 )
 
 func TestOpenDB(t *testing.T) {
@@ -1241,7 +1241,7 @@ func BenchmarkBeginTxNoop(b *testing.B) {
 // This tests that we don't give the same *stmt to two different callers that
 // prepare the same persistent query. See:
 //
-//	https://github.com/tailscale/sqlite/issues/73
+//	https://github.com/agentio/sqlite/issues/73
 func TestPrepareReuse(t *testing.T) {
 	db := openTestDB(t)
 	ctx := context.Background()

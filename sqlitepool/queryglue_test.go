@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/tailscale/sqlite/sqliteh"
-	"github.com/tailscale/sqlite/sqlstats"
+	"github.com/agentio/sqlite/sqliteh"
+	"github.com/agentio/sqlite/sqlstats"
 )
 
 func TestQueryGlue(t *testing.T) {

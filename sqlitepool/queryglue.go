@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tailscale/sqlite/sqliteh"
+	"github.com/agentio/sqlite/sqliteh"
 )
 
 // Exec is like database/sql.Tx.Exec.

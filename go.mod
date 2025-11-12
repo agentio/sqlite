@@ -1,3 +1,3 @@
-module github.com/tailscale/sqlite
+module github.com/agentio/sqlite
 
 go 1.21

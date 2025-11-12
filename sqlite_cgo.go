@@ -4,8 +4,8 @@
 package sqlite
 
 import (
-	"github.com/tailscale/sqlite/cgosqlite"
-	"github.com/tailscale/sqlite/sqliteh"
+	"github.com/agentio/sqlite/cgosqlite"
+	"github.com/agentio/sqlite/sqliteh"
 )
 
 func init() {
