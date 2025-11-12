@@ -77,6 +77,8 @@ type connStats struct {
 	why      string
 	at       time.Time
 	readOnly bool
+	done     bool
+	finished time.Time
 }
 
 func (t *Tracer) done(s *connStats) (why string, readOnly bool) {
@@ -84,9 +86,8 @@ func (t *Tracer) done(s *connStats) (why string, readOnly bool) {
 	why = s.why
 	readOnly = s.readOnly
 	at := s.at
-	s.why = ""
-	s.at = time.Time{}
-	s.readOnly = false
+	s.done = true
+	s.finished = time.Now()
 	s.mu.Unlock()
 
 	if t.TxTotalSeconds != nil {
@@ -233,6 +234,8 @@ func (t *Tracer) BeginTx(
 	s.why = why
 	s.at = time.Now()
 	s.readOnly = readOnly
+	s.done = false
+	s.finished = time.Time{}
 	s.mu.Unlock()
 
 	if t.TxCount != nil {
@@ -282,12 +285,16 @@ func (t *Tracer) Rollback(id sqliteh.TraceConnID, err error) {
 	}
 }
 
+type txSummary struct {
+	name     string
+	start    time.Time
+	readOnly bool
+	done     bool
+	finished time.Time
+}
+
 func (t *Tracer) HandleConns(w http.ResponseWriter, r *http.Request) {
-	type txSummary struct {
-		name     string
-		start    time.Time
-		readOnly bool
-	}
+
 	var summary []txSummary
 
 	t.curTxs.Range(func(k, v any) bool {
@@ -298,6 +305,8 @@ func (t *Tracer) HandleConns(w http.ResponseWriter, r *http.Request) {
 			name:     s.why,
 			start:    s.at,
 			readOnly: s.readOnly,
+			done:     s.done,
+			finished: s.finished,
 		})
 		s.mu.Unlock()
 
@@ -311,22 +320,36 @@ func (t *Tracer) HandleConns(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(200)
 	fmt.Fprintf(w, "<!DOCTYPE html><html><title>sqlite conns</title><body>\n")
-	fmt.Fprintf(w, "<p>outstanding sqlite transactions: %d</p>\n", len(summary))
-	fmt.Fprintf(w, "<pre>\n")
+	fmt.Fprintf(w, "<h1>Transactions (%d)</h1>\n", len(summary))
+	fmt.Fprintf(w, "<table>\n")
 	for _, s := range summary {
-		rw := ""
+		rw := "RO"
 		if !s.readOnly {
-			rw = " read-write"
+			rw = "RW"
 		}
 		fmt.Fprintf(
 			w,
-			"\n\t%s (%v)%s",
-			html.EscapeString(s.name),
-			now.Sub(s.start).Round(time.Millisecond),
+			"\n\t<tr><td>%s</td><td>%s</td><td>%v</td></tr>",
 			rw,
+			emphasizeIfTrue(s.done, html.EscapeString(s.name)),
+			displayDuration(now, s),
 		)
 	}
-	fmt.Fprintf(w, "</pre></body></html>\n")
+	fmt.Fprintf(w, "</table></body></html>\n")
+}
+
+func emphasizeIfTrue(v bool, s string) string {
+	if v {
+		return "<i>" + s + "</i>"
+	}
+	return "<strong>" + s + "</strong>"
+}
+
+func displayDuration(now time.Time, s txSummary) time.Duration {
+	if s.done {
+		return s.finished.Sub(s.start).Round(time.Millisecond)
+	}
+	return now.Sub(s.start).Round(time.Millisecond)
 }
 
 func (t *Tracer) Handle(w http.ResponseWriter, r *http.Request) {
