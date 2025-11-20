@@ -25,7 +25,7 @@ func ExecuteTransient(conn *sqlitepool.Rx, query string, options *ExecOptions) e
 		case string:
 			stmt.BindText64(i+1, v)
 		case []byte:
-			stmt.BindBlob64(i, v)
+			stmt.BindBlob64(i+1, v)
 		default:
 			return fmt.Errorf("unhandled type %T (fixme)", a)
 		}
